@@ -34,6 +34,12 @@ All of its dependencies should be standard GNU utilities that are already instal
 - `tail`
 - `awk`
 
+You may also install the man page by compressing it into a gzip file and copying it to the correct directory:
+```bash
+cat tmpdir.1 | gzip > tmpdir.1.gz
+sudo cp tmpdir.1.gz /usr/share/man/man1/
+```
+
 ## Usage
 
 ```
