@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ARGS="$@" # Save arguments, shift will modify $@
+
 usage() {
     echo "tmpdir [options] <directory>"
     echo "============================"
@@ -28,13 +30,13 @@ check_priv() {
         # Attempt to elevate privileges if we are not root
         # Attempt pkexec, sudo, su
         if [ -f "$(which sudo)" ]; then
-            sudo "$0" "$@"
+            sudo "$0" $ARGS
             exit $?
         elif [ -f "$(which pkexec)" ]; then
-            pkexec "$0" "$@"
+            pkexec "$0" $ARGS
             exit $?
         elif [ -f "$(which su)" ]; then
-            su -c "$0" "$@"
+            su -c "$0" $ARGS
             exit $?
         else
             echo "ERROR: Script must be run as root!"
@@ -109,6 +111,8 @@ while [ "$1" != "" ]; do
     shift
 done
 
+verbose "Full command line: $0 ${ARGS[@]}"
+
 # Set defaults
 if [ -z "$FILE" ]; then
     FILE="/etc/tmpdir.conf"
@@ -132,18 +136,18 @@ if [ -z "$LIST" ]; then
     LIST=0
 fi
 
-# DEBUG: Print out the variables
-# verbose "VERBOSE=$VERBOSE"
-# verbose "CLEAR=$CLEAR"
-# verbose "LIST=$LIST"
-# verbose "FILE=$FILE"
-# verbose "TYPE=$TYPE"
-# verbose "SIZE=$SIZE"
-# verbose "MODE=$MODE"
-# verbose "DIRECTORY=$DIRECTORY"
-
 # Check that we are root
 check_priv
+
+# DEBUG: Print out the variables
+verbose "VERBOSE=$VERBOSE"
+verbose "CLEAR=$CLEAR"
+verbose "LIST=$LIST"
+verbose "FILE=$FILE"
+verbose "TYPE=$TYPE"
+verbose "SIZE=$SIZE"
+verbose "MODE=$MODE"
+verbose "DIRECTORY=$DIRECTORY"
 
 create_file
 
