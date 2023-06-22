@@ -111,8 +111,6 @@ while [ "$1" != "" ]; do
     shift
 done
 
-verbose "Full command line: $0 ${ARGS[@]}"
-
 # Set defaults
 if [ -z "$FILE" ]; then
     FILE="/etc/tmpdir.conf"
@@ -135,6 +133,8 @@ fi
 if [ -z "$LIST" ]; then
     LIST=0
 fi
+
+verbose "Full command line: $0 ${ARGS[@]}"
 
 # Check that we are root
 check_priv
