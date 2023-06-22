@@ -27,11 +27,11 @@ check_priv() {
     if [ "$EUID" -ne 0 ]; then
         # Attempt to elevate privileges if we are not root
         # Attempt pkexec, sudo, su
-        if [ -f "$(which pkexec)" ]; then
-            pkexec "$0" "$@"
-            exit $?
-        elif [ -f "$(which sudo)" ]; then
+        if [ -f "$(which sudo)" ]; then
             sudo "$0" "$@"
+            exit $?
+        elif [ -f "$(which pkexec)" ]; then
+            pkexec "$0" "$@"
             exit $?
         elif [ -f "$(which su)" ]; then
             su -c "$0" "$@"
