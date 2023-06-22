@@ -1,0 +1,71 @@
+.\" Manpage for tmpdir
+
+.TH "22 Jun 2023" "tmpdir 1.0.0" "tmpdir 1.0.0" "User Commands"
+
+.SH NAME
+tmpdir \- create a temporary directory
+
+.SH SYNOPSIS
+tmpdir [OPTIONS] <DIRECTORY>
+
+.SH DESCRIPTION
+tmpdir is a command line utility for creating and managing temporary directories at arbitrary locations.
+
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Prints help information
+.TP
+.BR \-V ", " \-\-verbose
+Enables verbose output
+.TP
+.BR \-c ", " \-\-clear
+Clears all temporary directories, does not create a new one
+.TP
+.BR \-l ", " \-\-list
+Lists all temporary directories, does not create a new one
+.TP
+.BR \-f ", " \-\-file " <FILE>"
+Use a specific persistent configuration file instead of the default. Defaults to /etc/tmpdir.conf
+.TP
+.BR \-t ", " \-\-type " <TYPE>"
+Use a specific mount type instead of the default "tmpfs". No other types are officially supported but you may experiment with others at your own risk.
+.TP
+.BR \-s ", " \-\-size " <SIZE>"
+Use a specific size instead of the default "1G". The size is specified in standard byte notation.
+.TP
+.BR \-m ", " \-\-mode " <MODE>"
+Use a specific mode instead of the default "1777". The mode is specified in standard octal notation.
+
+.SH EXAMPLES
+Create a new temporary directory at \./tmp
+
+.BR tmpdir " ./tmp"
+
+Create a new temporary directory at \./tmp with a size of 16GB
+
+.BR tmpdir " ./tmp " \-s " 16G "
+
+Clear all temporary directories
+
+.BR tmpdir " " \-c
+
+List all temporary directories
+
+.BR tmpdir " " \-l
+
+.SH SEE ALSO
+You may want to automatically run "tmpdir -c" on startup to clear all temporary directories. See the best solution for your specific system.
+.TP
+.BR systemd "(1)"
+.TP
+.BR rc "(8)"
+.TP
+.BR init "(8)"
+.TP
+.BR cron "(8)"
+.TP
+.BR crontab "(5)"
+
+.SH AUTHOR
+This script has been written by Kodi Craft. You may contact me on my GitHub page at https://www.github.com/KodiCraft
