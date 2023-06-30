@@ -52,25 +52,6 @@ verbose() {
     fi
 }
 
-get_data() {
-    if [ -f "$FILE" ]; then
-        # Check that we have read access to the file
-        if [ ! -r "$FILE" ]; then
-            echo "ERROR: Cannot read $FILE"
-            exit 1
-        fi
-        # Place every line in the file into an array
-        IFS=$'\n' read -d '' -r -a lines < "$FILE"
-        # Remove every line that starts with a # or that is empty
-        lines=($(for line in "${lines[@]}"; do echo "$line"; done | grep -v "^#" | grep -v "^$"))
-        # Return the array
-        echo "${lines[@]}"
-    else
-        # The file does not exist, it will be written by the program
-        echo ""
-    fi
-}
-
 create_file() {
     if [ -f "${FILE}" ]; then
         verbose "${FILE} already exists, reading from it"
@@ -152,20 +133,45 @@ verbose "DIRECTORY=$DIRECTORY"
 create_file
 
 # Get the data from the file
-lines=($(get_data))
+
+if [ -f "$FILE" ]; then
+    # Check that we have read access to the file
+    if [ ! -r "$FILE" ]; then
+        echo "ERROR: Cannot read $FILE"
+        exit 1
+    fi
+    # Place every line in the file into an array, quoting each line individually
+    #lines=($(cat "$FILE" | sed -e "s/^/'/" -e "s/\$/'/" | tr -s '\n' | grep -v "^#" | grep -v "^$"))
+    lines=()
+    lineindex=0
+    
+    while read in; do
+        verbose "Read line: '$in'"
+        lines[$lineindex]="$in"
+        lineindex=$((lineindex+1))
+        verbose "Line index: $lineindex"
+    done <<< $(cat "$FILE" | grep -v "^#" | grep -v "^$")
+    verbose "Read ${#lines[@]} lines"
+else
+    # The file does not exist, it will be written by the program
+    lines=()
+fi
+
+verbose "Lines: ${lines[*]}"
 
 # Check if we should list the directories
 if [ "$LIST" -eq 1 ]; then
     echo "Currently existing temporary directories:"
     # List the directories
-    for line in "${lines[@]}"; do
+    for ((i = 0; i < ${#lines[@]}; i++)); do
+        line="${lines[$i]}"
         echo -n "$line - "
         if [ -d "$line" ]; then
             echo -n "Exists, "
-            if [ "$(fs_type $line)" == "$TYPE" ]; then
+            if [ "$(fs_type "$line")" == "$TYPE" ]; then
                 echo "mounted as $TYPE"
             else
-                echo "mounted as $(fs_type $line) (will be pruned on clear)"
+                echo "mounted as $(fs_type "$line") (will be pruned on clear)"
             fi
         else
             echo "Does not exist (will be pruned on clear)"
@@ -178,11 +184,12 @@ fi
 if [ "$CLEAR" -eq 1 ]; then
     echo "Clearing all temporary directories..."
     # Loop through the directories
-    for line in "${lines[@]}"; do
+    for ((i = 0; i < ${#lines[@]}; i++)); do
+        line="${lines[$i]}"
         # Check if the directory exists
         if [ -d "$line" ]; then
             # Check if the directory is mounted as the correct type
-            if [ "$(fs_type $line)" == "$TYPE" ]; then
+            if [ "$(fs_type "$line")" == "$TYPE" ]; then
                 # Unmount the directory
                 verbose "Unmounting $line"
                 umount "$line"
